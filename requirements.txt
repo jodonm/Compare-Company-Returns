@@ -1,4 +1,4 @@
 plotly
 numpy
 pandas
-yfinance
+yfinance==0.2.26
