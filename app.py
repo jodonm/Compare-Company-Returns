@@ -71,41 +71,29 @@ def visualize_returns(tickers): #function creates a chart that shows stock price
     st.plotly_chart(fig, use_container_width=True)
 
 
-def calculate_beta(ticker):  # Calculates beta by comparing stock data to SPY closing prices.
+def calculate_beta(ticker): #calculates beta by comparing stock data to SPY closing prices.
     try:
-        if ticker.upper() == "SPY":  # Sets beta of SPY to 1.00 to avoid errors.
+        if ticker == "SPY": #sets beta of SPY to 1.00 to avoid errors
             return 1.00
-
+        
         stock_data = get_historical_data(ticker)
-        if stock_data is None or stock_data.empty:
+        if stock_data is None:
             return None
-
+        
         spy_data = yf.download("SPY", period=selected_time_period, auto_adjust=False)['Adj Close']
-        if spy_data is None or spy_data.empty:
+        if spy_data.empty:
             st.error("No data available for SPY. Please check your internet connection.")
             return None
 
-        # Rename series so merged columns are labeled consistently.
-        stock_data = stock_data.rename(f'Adj Close_{ticker}')
-        spy_data = spy_data.rename('Adj Close_SPY')
+        merged_data = pd.merge(stock_data, spy_data, how='inner', left_index=True, right_index=True, suffixes=(f'_{ticker}', '_SPY'))
 
-        # Merge stock and SPY data on date index.
-        merged_data = pd.merge(stock_data, spy_data, how='inner', left_index=True, right_index=True)
-
-        # Calculate daily log returns for both series.
         log_returns_stock = np.log(merged_data[f'Adj Close_{ticker}'] / merged_data[f'Adj Close_{ticker}'].shift(1)).dropna()
         log_returns_spy = np.log(merged_data['Adj Close_SPY'] / merged_data['Adj Close_SPY'].shift(1)).dropna()
 
-        # Align data after dropna to avoid mismatched lengths.
-        aligned = pd.concat([log_returns_spy, log_returns_stock], axis=1).dropna()
-        if len(aligned) < 3:
-            st.error("Not enough overlapping data to compute beta.")
-            return None
+        slope, intercept = np.polyfit(log_returns_spy, log_returns_stock, 1)
+        beta = slope
 
-        # Run linear regression (slope = beta).
-        slope, intercept = np.polyfit(aligned.iloc[:, 0].values, aligned.iloc[:, 1].values, 1)
-        return slope
-
+        return beta
     except Exception as e:
         st.error(f"An error occurred while calculating beta for {ticker}")
         return None
