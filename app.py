@@ -28,7 +28,7 @@ def get_historical_data(ticker): #Pulls closing data from yahoo finance. Multipl
     try:
         if not ticker:
             return None
-        stock_data = yf.download(ticker, period=selected_time_period) #can change time period here
+        stock_data = yf.download(ticker, period=selected_time_period, auto_adjust=False) #can change time period here
         if stock_data.empty:
             st.error(f"No data available for {ticker}. Please enter a valid ticker.")
             return None
@@ -80,7 +80,7 @@ def calculate_beta(ticker): #calculates beta by comparing stock data to SPY clos
         if stock_data is None:
             return None
         
-        spy_data = yf.download("SPY", period=selected_time_period)['Adj Close']
+        spy_data = yf.download("SPY", period=selected_time_period, auto_adjust=False)['Adj Close']
         if spy_data.empty:
             st.error("No data available for SPY. Please check your internet connection.")
             return None
