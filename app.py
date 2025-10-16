@@ -20,8 +20,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-time_periods = ['5D', '1mo', '3mo', '6mo', '1Y', '2Y', '5Y', '10Y', '20Y', 'YTD', 'MAX']  # Valid time periods used for calculations
-default_time_period = '10Y' #sets default list selection to 10Y because 5D is less useful.
+time_periods = ['5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', '20y', 'ytd', 'max'] # Valid time periods used for calculations
+default_time_period = '10y'#sets default list selection to 10Y
 selected_time_period = st.selectbox("Select Time Period:", time_periods, index=time_periods.index(default_time_period))
 
 def get_historical_data(ticker): #Pulls closing data from yahoo finance. Multiple possible error messages.
